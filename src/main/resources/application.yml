@@ -9,8 +9,9 @@ scrooge:
   infrastructure:
     web:
       public-urls:
-        - "/public"
-        - "/static"
+        - "/swagger-ui/**"
+        - "/swagger-resources/**"
+        - "/v3/api-docs/**"
       trusted-issuers:
         - "https://sso.scrooge.lan/realms/scrooge-realm"
 
