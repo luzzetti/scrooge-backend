@@ -8,5 +8,7 @@ import lombok.Data;
 @Builder
 public class ResourceList<T> {
   private List<T> results;
-  private int resultsCount;
+  private int pageNumber;
+  private int pageSize;
+  private int totalElements;
 }

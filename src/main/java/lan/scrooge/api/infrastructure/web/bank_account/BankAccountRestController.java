@@ -1,7 +1,10 @@
 package lan.scrooge.api.infrastructure.web.bank_account;
 
-import java.util.Collections;
+import lan.scrooge.api.application.ports.input.CreateBankAccountUseCase;
+import lan.scrooge.api.application.ports.input.ListBankAccountQuery;
 import lan.scrooge.api.domain.entities.ScroogeUser;
+import lan.scrooge.api.domain.vos.BankAccountId;
+import lan.scrooge.api.domain.vos.MnemonicName;
 import lan.scrooge.api.infrastructure.web._shared.ResourceList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,15 +18,25 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 public class BankAccountRestController implements BankAccountRestApi {
 
+  private final CreateBankAccountUseCase createBankAccountUseCase;
+  private final ListBankAccountQuery listBankAccountQuery;
+
   @PostMapping
   @Override
   public ResponseEntity<BankAccountCreationResponse> createBankAccount(
       @AuthenticationPrincipal ScroogeUser principal,
       @RequestBody BankAccountCreationRequest request) {
 
-    log.info("createBankAccount: %s");
+    var command =
+        CreateBankAccountUseCase.CreateBankAccountCommand.builder()
+            .currentUser(principal)
+            .mnemonicName(MnemonicName.of(request.getMnemonicName()))
+            .build();
 
-    return ResponseEntity.created(null).body(null);
+    BankAccountId bankAccountId = createBankAccountUseCase.execute(command);
+
+    var response = new BankAccountCreationResponse(bankAccountId.toString());
+    return ResponseEntity.created(null).body(response);
   }
 
   @GetMapping
@@ -33,10 +46,23 @@ public class BankAccountRestController implements BankAccountRestApi {
 
     log.info("listBankAccounts: %s");
 
+    var criterion =
+        ListBankAccountQuery.ListBankAccountCriterion.builder().currentUser(principal).build();
+
+    var result = listBankAccountQuery.listBankAccount(criterion);
+
     var response =
         ResourceList.<BankAccountOverviewResource>builder()
-            .results(Collections.emptyList())
-            .resultsCount(0)
+            .results(
+                result.mapResults(
+                    r ->
+                        BankAccountOverviewResource.builder()
+                            .id(r.getId().asText())
+                            .mnemonicName(r.getMnemonicName().getValue())
+                            .build()))
+            .pageNumber(result.getPageNumber())
+            .pageSize(result.getPageSize())
+            .totalElements(result.getTotalElements())
             .build();
 
     return ResponseEntity.ok(response);

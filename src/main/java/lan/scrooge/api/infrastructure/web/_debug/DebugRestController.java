@@ -14,6 +14,7 @@ public class DebugRestController {
   @GetMapping("/me")
   public ResponseEntity<ScroogeUser> getPrincipal(
       @AuthenticationPrincipal ScroogeUser currentUser) {
+
     return ResponseEntity.ok(currentUser);
   }
 }
