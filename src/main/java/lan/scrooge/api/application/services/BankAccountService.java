@@ -1,5 +1,6 @@
 package lan.scrooge.api.application.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 import lan.scrooge.api._shared.QueryResultPaginated;
 import lan.scrooge.api.application.ports.input.CreateBankAccountUseCase;
@@ -36,6 +37,7 @@ public class BankAccountService
             .mnemonicName(command.mnemonicName())
             .iban(anIban)
             .owner(command.currentUser())
+            .balance(BigDecimal.valueOf(100))
             .build();
 
     // Persist
@@ -62,11 +64,11 @@ public class BankAccountService
 
     BankAccount theBankAccount = bankAccountPersistencePort.fetch(command.bankAccountId());
 
-    if (!theBankAccount.getOwner().getId().equals(command.currentUser().getId())) {
-      // Il vero errore è che l'utente corrente non è il proprietario del conto
-      // e di conseguenza non può leggerlo
-      // ma per convenzione ritorniamo che il conto non esiste
-      // per evitare di mostrare informazioni ad eventuali malintenzionati
+    // Il vero errore è che l'utente corrente non è il proprietario del conto
+    // e di conseguenza non può leggerlo
+    // ma per convenzione ritorniamo che il conto non esiste
+    // per evitare di mostrare informazioni ad eventuali malintenzionati
+    if (!theBankAccount.hasOwner(command.currentUser())) {
       throw new IllegalArgumentException("Bank account not found");
     }
 

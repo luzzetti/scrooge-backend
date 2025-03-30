@@ -63,6 +63,7 @@ public class BankAccountRestController implements BankAccountRestApi {
                             .id(r.getId().asText())
                             .iban(r.getIban().getValue())
                             .mnemonicName(r.getMnemonicName().getValue())
+                            .balance(r.getBalance())
                             .build()))
             .pageNumber(result.getPageNumber())
             .pageSize(result.getPageSize())
@@ -90,6 +91,7 @@ public class BankAccountRestController implements BankAccountRestApi {
             .id(bankAccount.getId().asText())
             .mnemonicName(bankAccount.getMnemonicName().getValue())
             .iban(bankAccount.getIban().getValue())
+            .balance(bankAccount.getBalance())
             .build();
 
     return ResponseEntity.ok(response);

@@ -1,5 +1,6 @@
 package lan.scrooge.api.infrastructure.web.bank_account;
 
+import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,5 +10,5 @@ public class BankAccountOverviewResource {
   private String id;
   private String iban;
   private String mnemonicName;
-  // Aggiungere altri dati come il saldo totale
+  private BigDecimal balance;
 }

@@ -1,6 +1,8 @@
 package lan.scrooge.api.domain.vos;
 
 import java.util.regex.Pattern;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -8,6 +10,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
+@EqualsAndHashCode
 public class IBAN {
 
   private static final Pattern IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]{11,30}$");
