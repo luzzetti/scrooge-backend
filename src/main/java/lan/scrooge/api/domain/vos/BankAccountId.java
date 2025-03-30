@@ -4,10 +4,12 @@ import java.util.UUID;
 import lan.scrooge.api._shared.exceptions.ApplicationError;
 import lan.scrooge.api._shared.exceptions.ElementNotValidException;
 import lan.scrooge.api._shared.guards.Guards;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
+@EqualsAndHashCode
 public class BankAccountId {
 
   private final UUID value;

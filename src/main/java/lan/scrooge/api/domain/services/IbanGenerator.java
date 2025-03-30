@@ -21,6 +21,20 @@ public class IbanGenerator {
   private static final Random random = new Random();
 
   public static IBAN generateRandomIBAN() {
-    return new IBAN("IT25W0300203280913377155915");
+    StringBuilder ibanBuilder = new StringBuilder(COUNTRY_CODE);
+
+    // Generate random control digits
+    ibanBuilder.append(random.nextInt(90) + 10); // Two digits between 10 and 99
+
+    // Append fixed bank and country-specific structure
+    ibanBuilder.append("03002"); // Bank and branch identifier
+    ibanBuilder.append("03280"); // National check digits and branch code
+
+    // Generate remaining random account number (numeric part of IBAN)
+    for (int i = 0; i < 13; i++) {
+      ibanBuilder.append(random.nextInt(10)); // Random digit between 0 and 9
+    }
+
+    return new IBAN(ibanBuilder.toString());
   }
 }

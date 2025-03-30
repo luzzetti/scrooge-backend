@@ -4,6 +4,7 @@ import java.util.List;
 import lan.scrooge.api._shared.QueryResultPaginated;
 import lan.scrooge.api.application.ports.input.CreateBankAccountUseCase;
 import lan.scrooge.api.application.ports.input.ListBankAccountQuery;
+import lan.scrooge.api.application.ports.input.ShowBankAccountQuery;
 import lan.scrooge.api.application.ports.output.BankAccountPersistencePort;
 import lan.scrooge.api.domain.entities.BankAccount;
 import lan.scrooge.api.domain.services.IbanGenerator;
@@ -16,12 +17,13 @@ import org.springframework.stereotype.Service;
 // Transactional
 @RequiredArgsConstructor
 @Log4j2
-public class BankAccountService implements ListBankAccountQuery, CreateBankAccountUseCase {
+public class BankAccountService
+    implements ShowBankAccountQuery, ListBankAccountQuery, CreateBankAccountUseCase {
 
   private final BankAccountPersistencePort bankAccountPersistencePort;
 
   @Override
-  public BankAccountId execute(CreateBankAccountCommand command) {
+  public BankAccountId create(CreateBankAccountCommand command) {
 
     // Create a new BankAccount
 
@@ -53,5 +55,21 @@ public class BankAccountService implements ListBankAccountQuery, CreateBankAccou
         .pageSize(bankAccounts.size())
         .totalElements(bankAccounts.size())
         .build();
+  }
+
+  @Override
+  public BankAccount showBankAccount(ShowBankAccountCriterion command) {
+
+    BankAccount theBankAccount = bankAccountPersistencePort.fetch(command.bankAccountId());
+
+    if (!theBankAccount.getOwner().getId().equals(command.currentUser().getId())) {
+      // Il vero errore è che l'utente corrente non è il proprietario del conto
+      // e di conseguenza non può leggerlo
+      // ma per convenzione ritorniamo che il conto non esiste
+      // per evitare di mostrare informazioni ad eventuali malintenzionati
+      throw new IllegalArgumentException("Bank account not found");
+    }
+
+    return theBankAccount;
   }
 }

@@ -27,7 +27,7 @@ public class BankAccountPersistenceMockAdapter implements BankAccountPersistence
   public BankAccount fetch(BankAccountId bankAccountId) {
     BankAccount bankAccount = database.get(bankAccountId);
     if (bankAccount == null) {
-      throw new IllegalArgumentException("Account not found");
+      throw new IllegalArgumentException("Bank account not found");
     }
     return bankAccount;
   }

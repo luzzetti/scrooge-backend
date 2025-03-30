@@ -2,6 +2,8 @@ package lan.scrooge.api.infrastructure.web.bank_account;
 
 import lan.scrooge.api.application.ports.input.CreateBankAccountUseCase;
 import lan.scrooge.api.application.ports.input.ListBankAccountQuery;
+import lan.scrooge.api.application.ports.input.ShowBankAccountQuery;
+import lan.scrooge.api.domain.entities.BankAccount;
 import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.BankAccountId;
 import lan.scrooge.api.domain.vos.MnemonicName;
@@ -20,6 +22,7 @@ public class BankAccountRestController implements BankAccountRestApi {
 
   private final CreateBankAccountUseCase createBankAccountUseCase;
   private final ListBankAccountQuery listBankAccountQuery;
+  private final ShowBankAccountQuery showBankAccountQuery;
 
   @PostMapping
   @Override
@@ -33,7 +36,7 @@ public class BankAccountRestController implements BankAccountRestApi {
             .mnemonicName(MnemonicName.of(request.getMnemonicName()))
             .build();
 
-    BankAccountId bankAccountId = createBankAccountUseCase.execute(command);
+    BankAccountId bankAccountId = createBankAccountUseCase.create(command);
 
     var response = new BankAccountCreationResponse(bankAccountId.toString());
     return ResponseEntity.created(null).body(response);
@@ -58,6 +61,7 @@ public class BankAccountRestController implements BankAccountRestApi {
                     r ->
                         BankAccountOverviewResource.builder()
                             .id(r.getId().asText())
+                            .iban(r.getIban().getValue())
                             .mnemonicName(r.getMnemonicName().getValue())
                             .build()))
             .pageNumber(result.getPageNumber())
@@ -73,8 +77,21 @@ public class BankAccountRestController implements BankAccountRestApi {
   public ResponseEntity<BankAccountResource> showBankAccount(
       @AuthenticationPrincipal ScroogeUser principal, @PathVariable String bankAccountId) {
 
-    log.info("showBankAccount: %s");
+    var criterion =
+        ShowBankAccountQuery.ShowBankAccountCriterion.builder()
+            .currentUser(principal)
+            .bankAccountId(BankAccountId.of(bankAccountId))
+            .build();
 
-    return ResponseEntity.ok().build();
+    BankAccount bankAccount = showBankAccountQuery.showBankAccount(criterion);
+
+    var response =
+        BankAccountResource.builder()
+            .id(bankAccount.getId().asText())
+            .mnemonicName(bankAccount.getMnemonicName().getValue())
+            .iban(bankAccount.getIban().getValue())
+            .build();
+
+    return ResponseEntity.ok(response);
   }
 }

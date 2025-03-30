@@ -8,7 +8,7 @@ import lombok.Builder;
 
 public interface CreateBankAccountUseCase {
 
-  BankAccountId execute(CreateBankAccountCommand command);
+  BankAccountId create(CreateBankAccountCommand command);
 
   @Builder
   record CreateBankAccountCommand(

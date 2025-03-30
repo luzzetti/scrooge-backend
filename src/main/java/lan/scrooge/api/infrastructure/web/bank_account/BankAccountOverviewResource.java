@@ -7,6 +7,7 @@ import lombok.Getter;
 @Builder
 public class BankAccountOverviewResource {
   private String id;
+  private String iban;
   private String mnemonicName;
   // Aggiungere altri dati come il saldo totale
 }
