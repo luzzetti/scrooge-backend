@@ -1,9 +1,11 @@
 package lan.scrooge.api.domain.vos;
 
 import java.util.regex.Pattern;
-
+import lan.scrooge.api._shared.exceptions.ApplicationError;
+import lan.scrooge.api._shared.exceptions.ElementNotValidException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 // (ISO 13616-1 standard)
@@ -21,7 +23,7 @@ public class IBAN {
     String normalizedIban = normalize(iban);
 
     if (!isValid(normalizedIban)) {
-      throw new IllegalArgumentException("Invalid IBAN: " + iban);
+      throw new ElementNotValidException(Errors.NOT_VALID_IBAN_FORMAT);
     }
 
     this.value = normalizedIban;
@@ -41,5 +43,12 @@ public class IBAN {
   private boolean verifyChecksum(String iban) {
     // For test purposes, skip checksum verification
     return true;
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  private enum Errors implements ApplicationError {
+    NOT_VALID_IBAN_FORMAT("not-valid.iban.format");
+    private final String code;
   }
 }

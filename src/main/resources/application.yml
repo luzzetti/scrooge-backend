@@ -12,6 +12,7 @@ scrooge:
         - "/swagger-ui/**"
         - "/swagger-resources/**"
         - "/v3/api-docs/**"
+        - "/debug-tools/errors/**"
       trusted-issuers:
         - "https://sso.scrooge.io/realms/scrooge-realm"
 

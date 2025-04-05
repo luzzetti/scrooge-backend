@@ -3,6 +3,9 @@ package lan.scrooge.api.application.services;
 import java.math.BigDecimal;
 import java.util.List;
 import lan.scrooge.api._shared.QueryResultPaginated;
+import lan.scrooge.api._shared.exceptions.ApplicationError;
+import lan.scrooge.api._shared.exceptions.ElementNotFoundException;
+import lan.scrooge.api._shared.exceptions.ElementNotValidException;
 import lan.scrooge.api.application.ports.input.ListBankTransactionsQuery;
 import lan.scrooge.api.application.ports.input.TransferFundsUseCase;
 import lan.scrooge.api.application.ports.output.BankAccountPersistencePort;
@@ -13,6 +16,7 @@ import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.BankAccountId;
 import lan.scrooge.api.domain.vos.BankTransactionId;
 import lan.scrooge.api.domain.vos.IBAN;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -53,47 +57,6 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
     return theBankTransaction.getId();
   }
 
-  /*
-   * Crea e valida una nuova transazione bancaria
-   */
-  private static BankTransaction createBankTransaction(
-      BankAccount sourceAccount, BankAccount targetAccount, BigDecimal amount) {
-
-    return BankTransaction.builder()
-        .id(BankTransactionId.generate())
-        .sourceAccountId(sourceAccount.getId())
-        .targetAccountId(targetAccount.getId())
-        .amount(amount)
-        .build();
-  }
-
-  private static void assertSourceAccountHasEnoughFunds(
-      BankAccount sourceAccount, BigDecimal amount) {
-    if (!sourceAccount.canWithdrawn(amount)) {
-      throw new IllegalArgumentException("Not enough funds on your account");
-    }
-  }
-
-  /*
-   * Il vero errore è che l'utente corrente non è il proprietario del conto
-   * e di conseguenza non può leggerlo
-   * ma per convenzione ritorniamo che il conto non esiste
-   * per evitare di mostrare informazioni ad eventuali malintenzionati
-   */
-  private static void assertBankAccountOwnership(BankAccount sourceAccount, ScroogeUser user) {
-    if (!sourceAccount.hasOwner(user)) {
-      throw new IllegalArgumentException("Bank account not found");
-    }
-  }
-
-  private BankAccount fetchAccount(IBAN iban) {
-    return bankAccountPersistencePort.fetchFromIban(iban).orElseThrow();
-  }
-
-  private BankAccount fetchAccount(BankAccountId bankAccountId) {
-    return bankAccountPersistencePort.fetch(bankAccountId);
-  }
-
   // Read-only transaction
   @Override
   public QueryResultPaginated<BankTransaction> listBankTransactions(
@@ -112,7 +75,58 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
         .build();
   }
 
+  /*
+   * Crea e valida una nuova transazione bancaria
+   */
+  private static BankTransaction createBankTransaction(
+      BankAccount sourceAccount, BankAccount targetAccount, BigDecimal amount) {
+
+    return BankTransaction.builder()
+        .id(BankTransactionId.generate())
+        .sourceAccountId(sourceAccount.getId())
+        .targetAccountId(targetAccount.getId())
+        .amount(amount)
+        .build();
+  }
+
+  private static void assertSourceAccountHasEnoughFunds(
+      BankAccount sourceAccount, BigDecimal amount) {
+    if (!sourceAccount.canWithdrawn(amount)) {
+      throw new ElementNotValidException(Errors.NOT_VALID_FUNDS_INSUFFICIENT);
+    }
+  }
+
+  /*
+   * Il vero errore è che l'utente corrente non è il proprietario del conto
+   * e di conseguenza non può leggerlo
+   * ma per convenzione ritorniamo che il conto non esiste
+   * per evitare di mostrare informazioni ad eventuali malintenzionati
+   */
+  private static void assertBankAccountOwnership(BankAccount sourceAccount, ScroogeUser user) {
+    if (!sourceAccount.hasOwner(user)) {
+      throw new ElementNotFoundException(Errors.NOT_FOUND_BANK_ACCOUNT);
+    }
+  }
+
+  private BankAccount fetchAccount(IBAN iban) {
+    return bankAccountPersistencePort
+        .fetchFromIban(iban)
+        .orElseThrow(() -> new ElementNotFoundException(Errors.NOT_FOUND_BANK_ACCOUNT));
+  }
+
+  private BankAccount fetchAccount(BankAccountId bankAccountId) {
+    return bankAccountPersistencePort.fetch(bankAccountId);
+  }
+
   private List<BankTransaction> fetchTransactionHistory(BankAccountId bankAccountId) {
     return bankTransactionPersistencePort.fetchAll(bankAccountId);
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  private enum Errors implements ApplicationError {
+    NOT_VALID_FUNDS_INSUFFICIENT("not-valid.funds.insufficient"),
+    NOT_FOUND_BANK_ACCOUNT("not-found.bank-account");
+    private final String code;
   }
 }

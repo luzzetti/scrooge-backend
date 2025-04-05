@@ -3,6 +3,8 @@ package lan.scrooge.api.application.services;
 import java.math.BigDecimal;
 import java.util.List;
 import lan.scrooge.api._shared.QueryResultPaginated;
+import lan.scrooge.api._shared.exceptions.ApplicationError;
+import lan.scrooge.api._shared.exceptions.ElementNotFoundException;
 import lan.scrooge.api.application.ports.input.CreateBankAccountUseCase;
 import lan.scrooge.api.application.ports.input.ListBankAccountQuery;
 import lan.scrooge.api.application.ports.input.ShowBankAccountQuery;
@@ -12,6 +14,7 @@ import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.services.IbanGenerator;
 import lan.scrooge.api.domain.vos.BankAccountId;
 import lan.scrooge.api.domain.vos.MnemonicName;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -72,9 +75,16 @@ public class BankAccountService
     // ma per convenzione ritorniamo che il conto non esiste
     // per evitare di mostrare informazioni ad eventuali malintenzionati
     if (!theBankAccount.hasOwner(command.currentUser())) {
-      throw new IllegalArgumentException("Bank account not found");
+      throw new ElementNotFoundException(Errors.NOT_FOUND_BANK_ACCOUNT);
     }
 
     return theBankAccount;
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  private enum Errors implements ApplicationError {
+    NOT_FOUND_BANK_ACCOUNT("not-found.bank-account");
+    private final String code;
   }
 }

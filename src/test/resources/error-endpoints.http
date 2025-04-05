@@ -1,0 +1,8 @@
+###
+GET {{host}}/debug-tools/errors/400
+###
+GET {{host}}/debug-tools/errors/404
+###
+GET {{host}}/debug-tools/errors/409
+###
+GET {{host}}/debug-tools/errors/5000

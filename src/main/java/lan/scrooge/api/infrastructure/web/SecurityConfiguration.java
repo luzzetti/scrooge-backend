@@ -47,7 +47,7 @@ public class SecurityConfiguration {
     http.oauth2ResourceServer(
         oauth2Conf -> oauth2Conf.authenticationManagerResolver(managerResolver));
 
-    //     Dico al WebServer che non voglio cookie
+    // Dico al WebServer che non voglio cookie
     http.sessionManagement(conf -> conf.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     // SENZA DI QUESTO, La corsConfigurationSource NON VIENE ELABORATA!
