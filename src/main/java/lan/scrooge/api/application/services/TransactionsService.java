@@ -1,7 +1,9 @@
 package lan.scrooge.api.application.services;
 
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import lan.scrooge.api._shared.QueryResultPaginated;
 import lan.scrooge.api._shared.exceptions.ApplicationError;
 import lan.scrooge.api._shared.exceptions.ElementNotFoundException;
@@ -37,10 +39,10 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
     BankAccount sourceAccount = fetchAccount(command.sourceIban());
     BankAccount targetAccount = fetchAccount(command.targetIban());
 
-    // Check if currentUser is the owner of the source
+    // Execute various checks to prevent invalid transactions and send the corresponding error
     assertBankAccountOwnership(sourceAccount, command.currentUser());
-    // Check if bank account has the money
-    assertSourceAccountHasEnoughFunds(sourceAccount, command.amount());
+    assertSourceAccountHasSufficientFunds(sourceAccount, command.amount());
+    assertSourceAndTargetAreDifferent(command.sourceIban(), command.targetIban());
 
     BankTransaction theBankTransaction =
         createBankTransaction(sourceAccount, targetAccount, command.amount());
@@ -55,6 +57,14 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
     bankAccountPersistencePort.persist(targetAccount);
 
     return theBankTransaction.getId();
+  }
+
+  private void assertSourceAndTargetAreDifferent(
+      @NotNull IBAN sourceIban, @NotNull IBAN targetIban) {
+
+    if (Objects.equals(sourceIban, targetIban)) {
+      throw new ElementNotValidException(Errors.NOT_VALID_TRANSFER_ON_SAME_ACCOUNT);
+    }
   }
 
   // Read-only transaction
@@ -89,7 +99,7 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
         .build();
   }
 
-  private static void assertSourceAccountHasEnoughFunds(
+  private static void assertSourceAccountHasSufficientFunds(
       BankAccount sourceAccount, BigDecimal amount) {
     if (!sourceAccount.canWithdrawn(amount)) {
       throw new ElementNotValidException(Errors.NOT_VALID_FUNDS_INSUFFICIENT);
@@ -126,7 +136,8 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
   @RequiredArgsConstructor
   private enum Errors implements ApplicationError {
     NOT_VALID_FUNDS_INSUFFICIENT("not-valid.funds.insufficient"),
-    NOT_FOUND_BANK_ACCOUNT("not-found.bank-account");
+    NOT_FOUND_BANK_ACCOUNT("not-found.bank-account"),
+    NOT_VALID_TRANSFER_ON_SAME_ACCOUNT("not-valid.transfer.on.same.account");
     private final String code;
   }
 }

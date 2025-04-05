@@ -6,10 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lan.scrooge.api._shared.exceptions.ApplicationError;
+import lan.scrooge.api._shared.exceptions.ElementNotFoundException;
 import lan.scrooge.api.application.ports.output.BankAccountPersistencePort;
 import lan.scrooge.api.domain.entities.BankAccount;
 import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -51,7 +54,7 @@ public class BankAccountPersistenceMockAdapter implements BankAccountPersistence
   public BankAccount fetch(BankAccountId bankAccountId) {
     BankAccount bankAccount = database.get(bankAccountId);
     if (bankAccount == null) {
-      throw new IllegalArgumentException("Bank account not found");
+      throw new ElementNotFoundException(Errors.NOT_FOUND_BANK_ACCOUNT);
     }
     return bankAccount;
   }
@@ -64,5 +67,12 @@ public class BankAccountPersistenceMockAdapter implements BankAccountPersistence
   @Override
   public Optional<BankAccount> fetchFromIban(IBAN iban) {
     return database.values().stream().filter(ba -> ba.getIban().equals(iban)).findFirst();
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  private enum Errors implements ApplicationError {
+    NOT_FOUND_BANK_ACCOUNT("not-found.bank-account");
+    private final String code;
   }
 }
