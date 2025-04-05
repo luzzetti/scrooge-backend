@@ -47,8 +47,6 @@ public class BankAccountRestController implements BankAccountRestApi {
   public ResponseEntity<ResourceList<BankAccountOverviewResource>> listBankAccounts(
       @AuthenticationPrincipal ScroogeUser principal, BankAccountSearchRequest request) {
 
-    log.info("listBankAccounts: %s");
-
     var criterion =
         ListBankAccountQuery.ListBankAccountCriterion.builder().currentUser(principal).build();
 
