@@ -8,8 +8,10 @@ import lan.scrooge.api.application.ports.input.ListBankAccountQuery;
 import lan.scrooge.api.application.ports.input.ShowBankAccountQuery;
 import lan.scrooge.api.application.ports.output.BankAccountPersistencePort;
 import lan.scrooge.api.domain.entities.BankAccount;
+import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.services.IbanGenerator;
 import lan.scrooge.api.domain.vos.BankAccountId;
+import lan.scrooge.api.domain.vos.MnemonicName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -26,24 +28,25 @@ public class BankAccountService
   @Override
   public BankAccountId create(CreateBankAccountCommand command) {
 
-    // Create a new BankAccount
+    var aBankAccount = createBankAccount(command.currentUser(), command.mnemonicName());
 
-    var anIban = IbanGenerator.generateRandomIBAN();
+    persist(aBankAccount);
 
-    BankAccountId bankAccountId = BankAccountId.generate();
-    var aBankAccount =
-        BankAccount.builder()
-            .id(bankAccountId)
-            .mnemonicName(command.mnemonicName())
-            .iban(anIban)
-            .owner(command.currentUser())
-            .balance(BigDecimal.valueOf(100))
-            .build();
+    return aBankAccount.getId();
+  }
 
-    // Persist
+  private static BankAccount createBankAccount(ScroogeUser owner, MnemonicName mnemonicName) {
+    return BankAccount.builder()
+        .id(BankAccountId.generate())
+        .mnemonicName(mnemonicName)
+        .iban(IbanGenerator.generateRandomIBAN())
+        .owner(owner)
+        .balance(BigDecimal.valueOf(100))
+        .build();
+  }
+
+  private void persist(BankAccount aBankAccount) {
     bankAccountPersistencePort.persist(aBankAccount);
-
-    return bankAccountId;
   }
 
   @Override

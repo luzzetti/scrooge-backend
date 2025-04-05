@@ -1,16 +1,16 @@
 ###
-GET http://localhost:8090/debug-tools/me
+GET {{host}}/debug-tools/me
 Authorization: Bearer {{$auth.token("token")}}
 
 
 ###
-GET http://localhost:8090/1.0/bank-accounts
+GET {{host}}/1.0/bank-accounts
 Authorization: Bearer {{$auth.token("token")}}
 Content-Type: application/json
 
 
 ###
-POST http://localhost:8090/1.0/bank-accounts
+POST {{host}}/1.0/bank-accounts
 Authorization: Bearer {{$auth.token("token")}}
 Content-Type: application/json
 
