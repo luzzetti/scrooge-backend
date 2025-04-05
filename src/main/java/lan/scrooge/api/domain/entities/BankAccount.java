@@ -32,11 +32,21 @@ public class BankAccount {
     return (balance.compareTo(amount) >= 0);
   }
 
-  public void withdrawn(@NotNull BigDecimal amount) {
+  public void elaborate(BankTransaction theBankTransaction) {
+    if (theBankTransaction.getSourceAccountId().equals(this.id)) {
+      withdrawn(theBankTransaction.getAmount());
+    } else if (theBankTransaction.getTargetAccountId().equals(this.id)) {
+      deposit(theBankTransaction.getAmount());
+    } else {
+      throw new ElementNotValidException(Errors.NOT_VALID_TRANSACTION);
+    }
+  }
+
+  private void withdrawn(@NotNull BigDecimal amount) {
     balance = balance.subtract(amount);
   }
 
-  public void deposit(@NotNull BigDecimal amount) {
+  private void deposit(@NotNull BigDecimal amount) {
     balance = balance.add(amount);
   }
 
@@ -61,7 +71,8 @@ public class BankAccount {
   @RequiredArgsConstructor
   private enum Errors implements ApplicationError {
     NOT_VALID_ID_NULL("not-valid.id.null"),
-    NOT_VALID_OWNER_NULL("not-valid.owner.null");
+    NOT_VALID_OWNER_NULL("not-valid.owner.null"),
+    NOT_VALID_TRANSACTION("not-valid.transaction.incoherent");
     private final String code;
   }
 }

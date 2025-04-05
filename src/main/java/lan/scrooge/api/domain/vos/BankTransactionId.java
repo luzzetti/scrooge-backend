@@ -10,29 +10,29 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @EqualsAndHashCode
-public class TransactionId {
+public class BankTransactionId {
 
   private final UUID value;
 
-  public TransactionId(UUID value) {
+  public BankTransactionId(UUID value) {
     Guards.guard(value).againstNull(new ElementNotValidException(Errors.NOT_VALID_ID_NULL));
     this.value = value;
   }
 
-  public static TransactionId of(UUID value) {
-    return new TransactionId(value);
+  public static BankTransactionId of(UUID value) {
+    return new BankTransactionId(value);
   }
 
-  public static TransactionId of(String value) {
-    return new TransactionId(UUID.fromString(value));
+  public static BankTransactionId of(String value) {
+    return new BankTransactionId(UUID.fromString(value));
   }
 
   public String asText() {
     return this.getValue().toString();
   }
 
-  public static TransactionId generate() {
-    return new TransactionId(UUID.randomUUID());
+  public static BankTransactionId generate() {
+    return new BankTransactionId(UUID.randomUUID());
   }
 
   @Getter

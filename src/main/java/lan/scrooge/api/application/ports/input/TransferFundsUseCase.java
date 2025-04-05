@@ -4,12 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.IBAN;
-import lan.scrooge.api.domain.vos.TransactionId;
+import lan.scrooge.api.domain.vos.BankTransactionId;
 import lombok.Builder;
 
 public interface TransferFundsUseCase {
 
-  TransactionId transfer(TransferFundsCommand command);
+  BankTransactionId transfer(TransferFundsCommand command);
 
   @Builder
   record TransferFundsCommand(

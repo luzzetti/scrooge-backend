@@ -13,7 +13,7 @@ scrooge:
         - "/swagger-resources/**"
         - "/v3/api-docs/**"
       trusted-issuers:
-        - "https://sso.scrooge.lan/realms/scrooge-realm"
+        - "https://sso.scrooge.io/realms/scrooge-realm"
 
 logging:
   level:

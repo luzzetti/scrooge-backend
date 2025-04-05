@@ -17,4 +17,5 @@ public interface BankAccountPersistencePort {
   List<BankAccount> fetchAll(@NotNull ScroogeUser scroogeUser);
 
   Optional<BankAccount> fetchFromIban(@NotNull IBAN iban);
+
 }
