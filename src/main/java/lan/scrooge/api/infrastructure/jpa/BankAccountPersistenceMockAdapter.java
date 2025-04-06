@@ -69,6 +69,11 @@ public class BankAccountPersistenceMockAdapter implements BankAccountPersistence
     return database.values().stream().filter(ba -> ba.getIban().equals(iban)).findFirst();
   }
 
+  @Override
+  public void delete(BankAccount theBankAccountToClose) {
+    database.remove(theBankAccountToClose.getId());
+  }
+
   @Getter
   @RequiredArgsConstructor
   private enum Errors implements ApplicationError {

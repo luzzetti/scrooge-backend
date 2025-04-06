@@ -12,18 +12,32 @@ public interface BankAccountRestApi {
    * Creates a new bank account for the specified user.
    *
    * @param principal the authenticated user for whom the bank account will be created
-   * @param request the request containing the details for the bank account creation, such as the mnemonic name
-   * @return a ResponseEntity containing the details of the newly created bank account, including its unique identifier
+   * @param request the request containing the details for the bank account creation, such as the
+   *     mnemonic name
+   * @return a ResponseEntity containing the details of the newly created bank account, including
+   *     its unique identifier
    */
   ResponseEntity<BankAccountCreationResponse> createBankAccount(
-          ScroogeUser principal, BankAccountCreationRequest request);
+      ScroogeUser principal, BankAccountCreationRequest request);
+
+  /**
+   * Closes an existing bank account based on the provided bank account ID.
+   *
+   * @param principal the authenticated user requesting the closure of the bank account
+   * @param bankAccountId the unique identifier of the bank account to be closed
+   * @param request the closure request details, including how to handle eventual remaining funds
+   * @return a ResponseEntity with no content indicating the outcome of the operation
+   */
+  ResponseEntity<Void> closeBankAccount(
+      ScroogeUser principal, String bankAccountId, BankAccountClosureRequest request);
 
   /**
    * Retrieves a list of bank accounts based on the provided search criteria.
    *
    * @param principal the authenticated user requesting the list of bank accounts
    * @param request the search request containing filtering criteria, such as a search text
-   * @return a ResponseEntity containing a ResourceList of BankAccountOverviewResource, which includes details of the filtered bank accounts
+   * @return a ResponseEntity containing a ResourceList of BankAccountOverviewResource, which
+   *     includes details of the filtered bank accounts
    */
   ResponseEntity<ResourceList<BankAccountOverviewResource>> listBankAccounts(
       ScroogeUser principal, BankAccountSearchRequest request);
@@ -33,9 +47,9 @@ public interface BankAccountRestApi {
    *
    * @param principal the authenticated user requesting the bank account details
    * @param bankAccountId the unique identifier of the bank account to be retrieved
-   * @return a ResponseEntity containing the details of the bank account, encapsulated in a BankAccountResource object
+   * @return a ResponseEntity containing the details of the bank account, encapsulated in a
+   *     BankAccountResource object
    */
   ResponseEntity<BankAccountResource> showBankAccount(
       @AuthenticationPrincipal ScroogeUser principal, @PathVariable String bankAccountId);
-
 }

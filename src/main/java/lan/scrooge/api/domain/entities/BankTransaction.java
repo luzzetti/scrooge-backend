@@ -44,6 +44,9 @@ public class BankTransaction {
       if (thisInstance.amount.compareTo(BigDecimal.ZERO) < 0) {
         throw new ElementNotValidException(Errors.NOT_VALID_AMOUNT_MUST_BE_POSITIVE);
       }
+      if (thisInstance.amount.compareTo(BigDecimal.ZERO) == 0) {
+        throw new ElementNotValidException(Errors.NOT_VALID_AMOUNT_CANNOT_BE_ZERO);
+      }
 
       return thisInstance;
     }
@@ -57,7 +60,8 @@ public class BankTransaction {
     NOT_VALID_TARGET_ACCOUNT_NULL("not-valid.target.account.null"),
     NOT_VALID_AMOUNT("not-valid.amount.null"),
     NOT_VALID_AMOUNT_MUST_BE_POSITIVE("not-valid.amount.must.be.positive"),
-    INCOHERENT_TRANSACTION_TIMESTAMP("not-valid.transaction.timestamp.incoherent");
+    INCOHERENT_TRANSACTION_TIMESTAMP("not-valid.transaction.timestamp.incoherent"),
+    NOT_VALID_AMOUNT_CANNOT_BE_ZERO("not-valid.amount.cannot.be.zero");
     private final String code;
   }
 }

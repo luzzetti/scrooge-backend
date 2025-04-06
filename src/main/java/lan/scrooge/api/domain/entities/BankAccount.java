@@ -50,6 +50,10 @@ public class BankAccount {
     balance = balance.add(amount);
   }
 
+  public boolean hasFunds() {
+    return this.balance.compareTo(BigDecimal.ZERO) > 0;
+  }
+
   /*
    * https://github.com/projectlombok/lombok/issues/2477#issuecomment-1637065102
    */

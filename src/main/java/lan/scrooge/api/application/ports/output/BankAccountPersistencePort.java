@@ -18,4 +18,5 @@ public interface BankAccountPersistencePort {
 
   Optional<BankAccount> fetchFromIban(@NotNull IBAN iban);
 
+  void delete(BankAccount theBankAccountToClose);
 }
