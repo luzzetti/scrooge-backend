@@ -27,8 +27,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfiguration {
 
   private final SecurityProperties properties;
-
   private final Map<String, AuthenticationManager> authenticationManagers = new HashMap<>();
+
+  private final ScroogePrincipalConverter scroogePrincipalConverter;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -63,7 +64,7 @@ public class SecurityConfiguration {
       Map<String, AuthenticationManager> authenticationManagers, String issuer) {
     JwtAuthenticationProvider authenticationProvider =
         new JwtAuthenticationProvider(JwtDecoders.fromOidcIssuerLocation(issuer));
-    authenticationProvider.setJwtAuthenticationConverter(new ScroogePrincipalConverter());
+    authenticationProvider.setJwtAuthenticationConverter(scroogePrincipalConverter);
     authenticationManagers.put(issuer, authenticationProvider::authenticate);
   }
 

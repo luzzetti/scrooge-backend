@@ -21,9 +21,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-// Transactional
+@Transactional
 @RequiredArgsConstructor
 @Log4j2
 public class BankAccountService
@@ -54,7 +55,7 @@ public class BankAccountService
         .mnemonicName(mnemonicName)
         .iban(IbanGenerator.generateRandomIBAN())
         .owner(owner)
-        .balance(BigDecimal.valueOf(100))
+        .balance(BigDecimal.ZERO)
         .build();
   }
 

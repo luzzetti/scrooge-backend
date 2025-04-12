@@ -29,6 +29,10 @@ public class IBAN {
     this.value = normalizedIban;
   }
 
+  public static IBAN of(String iban) {
+    return new IBAN(iban);
+  }
+
   private String normalize(String iban) {
     return iban.replaceAll("\\s+", "").toUpperCase();
   }
