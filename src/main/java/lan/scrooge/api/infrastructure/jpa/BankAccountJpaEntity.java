@@ -19,6 +19,7 @@ public class BankAccountJpaEntity {
   private String mnemonicName;
   private String iban;
   private BigDecimal balance;
+  private String status;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner_id")

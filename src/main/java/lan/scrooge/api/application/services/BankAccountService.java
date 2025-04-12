@@ -10,6 +10,7 @@ import lan.scrooge.api.application.ports.input.CloseBankAccountUseCase;
 import lan.scrooge.api.application.ports.input.CreateBankAccountUseCase;
 import lan.scrooge.api.application.ports.input.ListBankAccountQuery;
 import lan.scrooge.api.application.ports.input.ShowBankAccountQuery;
+import lan.scrooge.api.application.ports.output.BankAccountMessagingPort;
 import lan.scrooge.api.application.ports.output.BankAccountPersistencePort;
 import lan.scrooge.api.application.ports.output.BankTransactionPersistencePort;
 import lan.scrooge.api.domain.entities.BankAccount;
@@ -38,6 +39,8 @@ public class BankAccountService
   public static final String IBAN_OF_CHARITY_ORG = "IT60X0542811101000000123456";
   private final BankAccountPersistencePort bankAccountPersistencePort;
   private final BankTransactionPersistencePort bankTransactionPersistencePort;
+  // Messaging
+  private final BankAccountMessagingPort bankAccountMessagingPort;
 
   @Override
   public BankAccountId create(CreateBankAccountCommand command) {
@@ -45,8 +48,13 @@ public class BankAccountService
     var aBankAccount = createBankAccount(command.currentUser(), command.mnemonicName());
 
     persist(aBankAccount);
+    sendEvent(aBankAccount);
 
     return aBankAccount.getId();
+  }
+
+  private void sendEvent(BankAccount aBankAccount) {
+    bankAccountMessagingPort.sendBankAccountCreatedEvent(aBankAccount);
   }
 
   private static BankAccount createBankAccount(ScroogeUser owner, MnemonicName mnemonicName) {
@@ -56,6 +64,7 @@ public class BankAccountService
         .iban(IbanGenerator.generateRandomIBAN())
         .owner(owner)
         .balance(BigDecimal.ZERO)
+        .status(BankAccountStatus.OPEN)
         .build();
   }
 
@@ -100,7 +109,8 @@ public class BankAccountService
 
     // Se non ha fondi rimanenti chiudi account e ritorna
     if (!theBankAccountToClose.hasFunds()) {
-      bankAccountPersistencePort.delete(theBankAccountToClose);
+      theBankAccountToClose.close();
+      bankAccountPersistencePort.persist(theBankAccountToClose);
       return;
     }
 
@@ -116,22 +126,21 @@ public class BankAccountService
     theBankAccountToClose.elaborate(theBankTransaction);
     beneficiaryOfRemainingFunds.elaborate(theBankTransaction);
 
+    theBankAccountToClose.close();
+
     // save both
-    bankAccountPersistencePort.delete(theBankAccountToClose);
+    bankAccountPersistencePort.persist(theBankAccountToClose);
     bankAccountPersistencePort.persist(beneficiaryOfRemainingFunds);
   }
 
   private BankAccount getBeneficiaryBankAccount(RemainingFundDestination destination, IBAN iban) {
 
-    if (destination == RemainingFundDestination.IBAN) {
-      return fetchBankAccount(iban);
-
-    } else if (destination == RemainingFundDestination.CHARITY) {
-      return fetchBankAccount(new IBAN(IBAN_OF_CHARITY_ORG));
-
-    } else {
-      throw new ElementNotValidException(Errors.NOT_VALID_FUND_DESTINATION_OPTION);
-    }
+    return switch (destination) {
+      case RemainingFundDestination.IBAN -> fetchBankAccount(iban);
+      case RemainingFundDestination.CHARITY -> fetchBankAccount(new IBAN(IBAN_OF_CHARITY_ORG));
+      case null, default ->
+          throw new ElementNotValidException(Errors.NOT_VALID_FUND_DESTINATION_OPTION);
+    };
   }
 
   private static void assertBankAccountOwnership(BankAccount sourceAccount, ScroogeUser user) {

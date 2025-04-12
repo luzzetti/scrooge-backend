@@ -1,7 +1,10 @@
 package lan.scrooge.api.infrastructure.jpa;
 
 import java.util.List;
+import java.util.UUID;
+import lan.scrooge.api._shared.QueryResultPaginated;
 import lan.scrooge.api._shared.exceptions.ApplicationError;
+import lan.scrooge.api.application.ports.input.ListUserTransactionsQuery;
 import lan.scrooge.api.application.ports.output.BankTransactionPersistencePort;
 import lan.scrooge.api.domain.entities.BankTransaction;
 import lan.scrooge.api.domain.vos.*;
@@ -13,7 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 @RequiredArgsConstructor
-public class BankTransactionJpaAdapter implements BankTransactionPersistencePort {
+public class BankTransactionJpaAdapter
+    implements BankTransactionPersistencePort, ListUserTransactionsQuery {
 
   private final BankTransactionRepository bankTransactionRepository;
   private final BankAccountRepository bankAccountRepository;
@@ -51,6 +55,22 @@ public class BankTransactionJpaAdapter implements BankTransactionPersistencePort
         .targetAccountId(BankAccountId.of(bt.getTargetAccount().getId()))
         .amount(bt.getAmount())
         .createdAt(bt.getCreatedAt())
+        .build();
+  }
+
+  @Override
+  public QueryResultPaginated<UserTransactionProjection> listUserTransactions(
+      ListUserTransactionsCriterion command) {
+
+    UUID userId = command.currentUser().getId().getValue();
+    List<UserTransactionProjection> userTransactions =
+        bankTransactionRepository.findAllByUserId(userId);
+
+    return QueryResultPaginated.<UserTransactionProjection>builder()
+        .results(userTransactions)
+        .totalElements(userTransactions.size())
+        .pageNumber(0)
+        .pageSize(Integer.MAX_VALUE)
         .build();
   }
 

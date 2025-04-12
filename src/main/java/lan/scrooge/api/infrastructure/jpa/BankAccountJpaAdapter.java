@@ -32,6 +32,7 @@ public class BankAccountJpaAdapter implements BankAccountPersistencePort {
     jpaEntity.setMnemonicName(bankAccount.getMnemonicName().getValue());
     jpaEntity.setIban(bankAccount.getIban().getValue());
     jpaEntity.setBalance(bankAccount.getBalance());
+    jpaEntity.setStatus(bankAccount.getStatus().name());
     jpaEntity.setOwner(proxiedOwner);
 
     bankAccountRepository.save(jpaEntity);
@@ -60,17 +61,13 @@ public class BankAccountJpaAdapter implements BankAccountPersistencePort {
         .map(BankAccountJpaAdapter::toBankAccount);
   }
 
-  @Override
-  public void delete(BankAccount theBankAccountToClose) {
-    throw new UnsupportedOperationException("Not yet implemented");
-  }
-
   private static BankAccount toBankAccount(BankAccountJpaEntity e) {
     return BankAccount.builder()
         .id(BankAccountId.of(e.getId()))
         .mnemonicName(MnemonicName.of(e.getMnemonicName()))
         .iban(IBAN.of(e.getIban()))
         .balance(e.getBalance())
+        .status(BankAccountStatus.valueOf(e.getStatus()))
         .owner(
             ScroogeUser.builder()
                 .id(ScroogeUserId.of(e.getOwner().getId()))

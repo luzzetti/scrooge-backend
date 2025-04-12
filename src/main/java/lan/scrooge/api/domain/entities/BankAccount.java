@@ -6,6 +6,7 @@ import lan.scrooge.api._shared.exceptions.ApplicationError;
 import lan.scrooge.api._shared.exceptions.ElementNotValidException;
 import lan.scrooge.api._shared.guards.Guards;
 import lan.scrooge.api.domain.vos.BankAccountId;
+import lan.scrooge.api.domain.vos.BankAccountStatus;
 import lan.scrooge.api.domain.vos.IBAN;
 import lan.scrooge.api.domain.vos.MnemonicName;
 import lombok.*;
@@ -23,6 +24,7 @@ public class BankAccount {
   private final IBAN iban;
   private ScroogeUser owner;
   private BigDecimal balance;
+  private BankAccountStatus status;
 
   public boolean hasOwner(ScroogeUser user) {
     return this.owner.getId().equals(user.getId());
@@ -54,6 +56,16 @@ public class BankAccount {
     return this.balance.compareTo(BigDecimal.ZERO) > 0;
   }
 
+  public void close() {
+
+    // Check if balance is ZERO
+    if (this.balance.compareTo(BigDecimal.ZERO) != 0) {
+      throw new ElementNotValidException(Errors.NOT_VALID_CLOSING_ACCOUNT_WITH_BALANCE);
+    }
+
+    this.status = BankAccountStatus.CLOSED;
+  }
+
   /*
    * https://github.com/projectlombok/lombok/issues/2477#issuecomment-1637065102
    */
@@ -76,7 +88,8 @@ public class BankAccount {
   private enum Errors implements ApplicationError {
     NOT_VALID_ID_NULL("not-valid.id.null"),
     NOT_VALID_OWNER_NULL("not-valid.owner.null"),
-    NOT_VALID_TRANSACTION("not-valid.transaction.incoherent");
+    NOT_VALID_TRANSACTION("not-valid.transaction.incoherent"),
+    NOT_VALID_CLOSING_ACCOUNT_WITH_BALANCE("not-valid.closing.account.with.balance");
     private final String code;
   }
 }

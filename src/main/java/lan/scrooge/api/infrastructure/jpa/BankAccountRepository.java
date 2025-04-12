@@ -11,9 +11,20 @@ public interface BankAccountRepository
     extends JpaRepository<BankAccountJpaEntity, UUID>,
         JpaSpecificationExecutor<BankAccountJpaEntity> {
 
-  @Query("SELECT ba FROM BankAccountJpaEntity ba WHERE ba.iban = :iban")
+  @Query("""
+          SELECT ba
+          FROM BankAccountJpaEntity ba
+          WHERE ba.iban = :iban
+          AND ba.status <> 'CLOSED'
+          """)
   Optional<BankAccountJpaEntity> findByIban(String iban);
 
-  @Query("SELECT ba FROM BankAccountJpaEntity ba WHERE ba.owner.id = :ownerId")
+  @Query("""
+            SELECT ba
+            FROM BankAccountJpaEntity ba
+            WHERE ba.owner.id = :ownerId
+            AND ba.status <> 'CLOSED'
+            ORDER BY ba.mnemonicName ASC
+          """)
   List<BankAccountJpaEntity> findAllByOwnerId(UUID ownerId);
 }
