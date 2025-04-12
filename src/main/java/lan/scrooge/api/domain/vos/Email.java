@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class Email {
 
-  private static final String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-  private static final Pattern emailPattern = Pattern.compile(emailRegex);
+  private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+  private static final Pattern emailPattern = Pattern.compile(EMAIL_REGEX);
 
   private final String value;
 

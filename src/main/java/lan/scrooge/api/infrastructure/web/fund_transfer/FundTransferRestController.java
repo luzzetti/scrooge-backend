@@ -87,6 +87,8 @@ public class FundTransferRestController implements FundTransferRestApi {
     var criterion =
         ListUserTransactionsQuery.ListUserTransactionsCriterion.builder()
             .currentUser(principal)
+            .pageNumber(request.pageNumber())
+            .pageSize(request.pageSize())
             .build();
 
     var results = listUserTransactionsQuery.listUserTransactions(criterion);

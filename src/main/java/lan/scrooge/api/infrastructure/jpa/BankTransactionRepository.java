@@ -39,8 +39,10 @@ public interface BankTransactionRepository
                            join bank_accounts a on u.id = a.owner_id
                            join transactions t on a.id = t.source_account_id or a.id = t.target_account_id
                   where u.id = :userId
-                  order by t.created_at DESC;
+                  order by t.created_at DESC
+                  offset :pageNumber * :pageSize
+                  limit :pageSize
                   """,
       nativeQuery = true)
-  List<UserTransactionProjection> findAllByUserId(UUID userId);
+  List<UserTransactionProjection> findAllByUserId(UUID userId, int pageNumber, int pageSize);
 }

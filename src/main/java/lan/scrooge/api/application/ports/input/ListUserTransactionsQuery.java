@@ -12,5 +12,6 @@ public interface ListUserTransactionsQuery {
       ListUserTransactionsCriterion command);
 
   @Builder
-  record ListUserTransactionsCriterion(@NotNull ScroogeUser currentUser) {}
+  record ListUserTransactionsCriterion(
+      @NotNull ScroogeUser currentUser, Integer pageNumber, Integer pageSize) {}
 }

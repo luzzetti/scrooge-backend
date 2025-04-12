@@ -64,7 +64,7 @@ public class BankTransactionJpaAdapter
 
     UUID userId = command.currentUser().getId().getValue();
     List<UserTransactionProjection> userTransactions =
-        bankTransactionRepository.findAllByUserId(userId);
+        bankTransactionRepository.findAllByUserId(userId, command.pageNumber(), command.pageSize());
 
     return QueryResultPaginated.<UserTransactionProjection>builder()
         .results(userTransactions)
