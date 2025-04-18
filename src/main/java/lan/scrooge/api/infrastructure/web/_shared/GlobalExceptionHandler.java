@@ -50,16 +50,4 @@ public class GlobalExceptionHandler {
     return aProblem;
   }
 
-  /*
-   * TODO:
-   *  Controllare l'ordine degli interceptors, perché spring security potrebbe avere la precedenza in alcuni casi
-   */
-  @ExceptionHandler(Exception.class)
-  public ProblemDetail handleRuntime(RuntimeException e) {
-    var aProblem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    aProblem.setTitle("Techical Difficulties");
-    aProblem.setDetail("We're having troubles at the moment. Please try again later or file a bug");
-    aProblem.setInstance(URI.create(e.getMessage()));
-    return aProblem;
-  }
 }

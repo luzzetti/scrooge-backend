@@ -30,6 +30,11 @@ spring:
     default-schema: public
     enabled: true
 
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: scrooge-client-fe
+
 scrooge:
   infrastructure:
     web:
@@ -44,4 +49,4 @@ scrooge:
 logging:
   level:
     org.springframework.web: INFO
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
