@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(
     servers = @Server(url = "/"),
     info = @Info(title = "Scrooge Be", version = "1.0.0"),
-    security = {@SecurityRequirement(name = "auth")})
+    security = {@SecurityRequirement(name = "Keycloak")})
 @SecurityScheme(
     type = SecuritySchemeType.OAUTH2,
     name = "Keycloak",
