@@ -8,6 +8,7 @@ import lan.scrooge.api.domain.entities.BankTransaction;
 import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.BankAccountId;
 import lan.scrooge.api.domain.vos.BankTransactionId;
+import lan.scrooge.api.domain.vos.Causale;
 import lan.scrooge.api.domain.vos.IBAN;
 import lan.scrooge.api.infrastructure.jpa.UserTransactionProjection;
 import lan.scrooge.api.infrastructure.web._shared.ResourceList;
@@ -39,6 +40,7 @@ public class FundTransferRestController implements FundTransferRestApi {
             .sourceIban(new IBAN(request.getSourceIban()))
             .targetIban(new IBAN(request.getTargetIban()))
             .amount(request.getAmount())
+            .causale(Causale.of(request.getCausale()))
             .build();
 
     BankTransactionId transactionId = transferFundsUseCase.transfer(command);

@@ -3,12 +3,10 @@ package lan.scrooge.api.infrastructure.jpa;
 import java.util.List;
 import java.util.UUID;
 import lan.scrooge.api._shared.QueryResultPaginated;
-import lan.scrooge.api._shared.exceptions.ApplicationError;
 import lan.scrooge.api.application.ports.input.ListUserTransactionsQuery;
 import lan.scrooge.api.application.ports.output.BankTransactionPersistencePort;
 import lan.scrooge.api.domain.entities.BankTransaction;
 import lan.scrooge.api.domain.vos.*;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -36,6 +34,7 @@ public class BankTransactionJpaAdapter
     entity.setSourceAccount(sourceAccountProxied);
     entity.setTargetAccount(targetAccountProxied);
     entity.setAmount(theBankTransaction.getAmount());
+    entity.setCausale(theBankTransaction.getCausale() != null ? theBankTransaction.getCausale().getValue() : null);
     entity.setCreatedAt(theBankTransaction.getCreatedAt());
 
     bankTransactionRepository.save(entity);
@@ -54,6 +53,7 @@ public class BankTransactionJpaAdapter
         .sourceAccountId(BankAccountId.of(bt.getSourceAccount().getId()))
         .targetAccountId(BankAccountId.of(bt.getTargetAccount().getId()))
         .amount(bt.getAmount())
+        .causale(bt.getCausale() != null ? Causale.of(bt.getCausale()) : null)
         .createdAt(bt.getCreatedAt())
         .build();
   }
@@ -74,10 +74,4 @@ public class BankTransactionJpaAdapter
         .build();
   }
 
-  @Getter
-  @RequiredArgsConstructor
-  private enum Errors implements ApplicationError {
-    NOT_FOUND_BANK_ACCOUNT("not-found.bank-account");
-    private final String code;
-  }
 }

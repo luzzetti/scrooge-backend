@@ -27,5 +27,8 @@ public class BankTransactionJpaEntity {
 
   private BigDecimal amount;
 
+  @Column(length = 150)
+  private String causale;
+
   private Instant createdAt;
 }

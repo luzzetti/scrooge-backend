@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.IBAN;
 import lan.scrooge.api.domain.vos.BankTransactionId;
+import lan.scrooge.api.domain.vos.Causale;
 import lombok.Builder;
 
 public interface TransferFundsUseCase {
@@ -16,5 +17,6 @@ public interface TransferFundsUseCase {
       @NotNull ScroogeUser currentUser,
       @NotNull IBAN sourceIban,
       @NotNull IBAN targetIban,
-      @NotNull BigDecimal amount) {}
+      @NotNull BigDecimal amount,
+      @NotNull Causale causale) {}
 }

@@ -7,6 +7,7 @@ import lan.scrooge.api._shared.exceptions.ElementNotValidException;
 import lan.scrooge.api._shared.guards.Guards;
 import lan.scrooge.api.domain.vos.BankAccountId;
 import lan.scrooge.api.domain.vos.BankTransactionId;
+import lan.scrooge.api.domain.vos.Causale;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
@@ -20,6 +21,7 @@ public class BankTransaction {
   private final BankAccountId sourceAccountId;
   private final BankAccountId targetAccountId;
   private final BigDecimal amount;
+  private final Causale causale;
   @Builder.Default private final Instant createdAt = Instant.now();
 
   /*
@@ -38,6 +40,8 @@ public class BankTransaction {
           .againstNull(new ElementNotValidException(Errors.NOT_VALID_TARGET_ACCOUNT_NULL));
       Guards.guard(thisInstance.amount)
           .againstNull(new ElementNotValidException(Errors.NOT_VALID_AMOUNT));
+      Guards.guard(thisInstance.causale)
+          .againstNull(new ElementNotValidException(Errors.NOT_VALID_CAUSALE_NULL));
       Guards.guard(thisInstance.createdAt)
           .againstNull(new ElementNotValidException(Errors.INCOHERENT_TRANSACTION_TIMESTAMP));
 
@@ -61,7 +65,8 @@ public class BankTransaction {
     NOT_VALID_AMOUNT("not-valid.amount.null"),
     NOT_VALID_AMOUNT_MUST_BE_POSITIVE("not-valid.amount.must.be.positive"),
     INCOHERENT_TRANSACTION_TIMESTAMP("not-valid.transaction.timestamp.incoherent"),
-    NOT_VALID_AMOUNT_CANNOT_BE_ZERO("not-valid.amount.cannot.be.zero");
+    NOT_VALID_AMOUNT_CANNOT_BE_ZERO("not-valid.amount.cannot.be.zero"),
+    NOT_VALID_CAUSALE_NULL("not-valid.causale.null");
     private final String code;
   }
 }

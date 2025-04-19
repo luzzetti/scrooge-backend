@@ -8,4 +8,5 @@ public final class FundsTransferRequest {
   private final String sourceIban;
   private final String targetIban;
   private final BigDecimal amount;
+  private final String causale;
 }

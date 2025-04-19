@@ -17,6 +17,7 @@ import lan.scrooge.api.domain.entities.BankTransaction;
 import lan.scrooge.api.domain.entities.ScroogeUser;
 import lan.scrooge.api.domain.vos.BankAccountId;
 import lan.scrooge.api.domain.vos.BankTransactionId;
+import lan.scrooge.api.domain.vos.Causale;
 import lan.scrooge.api.domain.vos.IBAN;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
     assertSourceAndTargetAreDifferent(command.sourceIban(), command.targetIban());
 
     BankTransaction theBankTransaction =
-        createBankTransaction(sourceAccount, targetAccount, command.amount());
+        createBankTransaction(sourceAccount, targetAccount, command.amount(), command.causale());
     bankTransactionPersistencePort.append(theBankTransaction);
 
     // move funds
@@ -90,13 +91,14 @@ public class TransactionsService implements TransferFundsUseCase, ListBankTransa
    * Crea e valida una nuova transazione bancaria
    */
   private static BankTransaction createBankTransaction(
-      BankAccount sourceAccount, BankAccount targetAccount, BigDecimal amount) {
+      BankAccount sourceAccount, BankAccount targetAccount, BigDecimal amount, Causale causale) {
 
     return BankTransaction.builder()
         .id(BankTransactionId.generate())
         .sourceAccountId(sourceAccount.getId())
         .targetAccountId(targetAccount.getId())
         .amount(amount)
+        .causale(causale)
         .build();
   }
 
