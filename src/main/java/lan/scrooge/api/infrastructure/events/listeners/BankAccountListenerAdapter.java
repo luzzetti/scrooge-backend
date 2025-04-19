@@ -3,6 +3,7 @@ package lan.scrooge.api.infrastructure.events.listeners;
 import java.math.BigDecimal;
 import lan.scrooge.api.application.ports.input.TransferFundsUseCase;
 import lan.scrooge.api.domain.entities.ScroogeUser;
+import lan.scrooge.api.domain.vos.Causale;
 import lan.scrooge.api.domain.vos.Email;
 import lan.scrooge.api.domain.vos.IBAN;
 import lan.scrooge.api.domain.vos.ScroogeUserId;
@@ -28,6 +29,8 @@ public class BankAccountListenerAdapter {
             .sourceIban(IBAN.of("IT60X0542811101000000123456"))
             .targetIban(event.iban())
             .amount(BigDecimal.valueOf(1000))
+            .causale(
+                Causale.of("Ti è stata accreditata una somma iniziale da un'ente di beneficienza"))
             .build();
 
     transferFundsUseCase.transfer(command);

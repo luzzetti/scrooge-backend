@@ -49,4 +49,4 @@ scrooge:
 logging:
   level:
     org.springframework.web: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO

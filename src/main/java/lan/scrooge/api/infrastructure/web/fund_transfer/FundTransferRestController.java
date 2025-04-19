@@ -72,6 +72,7 @@ public class FundTransferRestController implements FundTransferRestApi {
                             .transactionType(evaluateTransactionType(t, request.bankAccountId()))
                             .amount(t.getAmount())
                             .createdAt(t.getCreatedAt())
+                            .causale(t.getCausale() != null ? t.getCausale().asText() : null)
                             .build()))
             .pageNumber(results.getPageNumber())
             .pageSize(results.getPageSize())

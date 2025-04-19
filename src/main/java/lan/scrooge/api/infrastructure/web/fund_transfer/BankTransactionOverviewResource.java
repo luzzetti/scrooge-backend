@@ -14,4 +14,5 @@ public class BankTransactionOverviewResource {
   private TransactionType transactionType;
   private BigDecimal amount;
   private Instant createdAt;
+  private String causale;
 }
