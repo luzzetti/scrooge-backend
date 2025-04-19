@@ -170,6 +170,7 @@ public class BankAccountService
         .sourceAccountId(sourceAccount.getId())
         .targetAccountId(targetAccount.getId())
         .amount(amount)
+        .causale(Causale.of("Chiusura conto"))
         .build();
   }
 
