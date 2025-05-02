@@ -27,7 +27,11 @@ public class ScroogePrincipalConverter implements Converter<Jwt, ScroogeAuthenti
     ScroogeUser user = ScroogeUser.builder().id(thePrincipalId).email(thePrincipalEmail).build();
 
     var command = InitializeUserUseCase.InitializeUserCommand.builder().currentUser(user).build();
-    initializeUserUseCase.initializeUser(command);
+    try {
+      initializeUserUseCase.initializeUser(command);
+    } catch (Exception e) {
+      log.warn("Conflicts during user-upsertion. Manually checking data coherence it's advised");
+    }
 
     log.debug(() -> "Correctly converted JWT token to UserPrincipal %s".formatted(user));
     return new ScroogeAuthenticationToken(source, user);
